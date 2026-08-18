@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.env
+
+# Data
+data/raw/*.csv
+data/cleaned/*.csv
+
+# Models
+*.pkl
+*.h5
+*.pt
+checkpoints/
+
+# IDE
+.idea/
+.vscode/
