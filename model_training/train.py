@@ -140,7 +140,7 @@ def train(
     if "optimizer_state_dict" in checkpoint:
         optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
 
-    loss_fn = nn.MSELoss()
+    loss_fn = nn.BCELoss() # Loss function for binary classification task with Sigmoid output
     start_epoch = checkpoint.get("epoch", 0) + 1
 
     for epoch in range(start_epoch, start_epoch + epochs):

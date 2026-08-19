@@ -75,6 +75,7 @@ class StockCNN1D(nn.Module):
             nn.GELU(),
             nn.Dropout(dropout),
             nn.Linear(128, num_outputs),
+            nn.Sigmoid() # Added Sigmoid for binary classification probability output
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:

@@ -24,7 +24,7 @@ NUM_INPUT_FEATURES = 8
 # (it pools over time), so this only fixes what training/export use.
 SEQUENCE_LENGTH = 60
 
-# Number of values the model predicts per example. 1 == next close price.
+# Number of values the model predicts per example. 1 == probability of next-period up-move (binary classification).
 NUM_OUTPUTS = 1
 
 # --- Paths -----------------------------------------------------------
