@@ -6,4 +6,4 @@ we want the data to be served similar to kaggle or scikit learn, and useable fro
 
 the database should be in postgres. and useablewith numpy and other libraries properly to view and sue the data. 
 
-must have routes setup f=properly for the stocki docker network in a container. 
+must have routes setup properly for the stocki docker network in a container. 
