@@ -1,0 +1,3 @@
+# Installs the Stocki backend and everything it needs, in editable mode.
+#   pip install -r requirements.txt
+-e ./backend[dev]

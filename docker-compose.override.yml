@@ -1,0 +1,12 @@
+# Local development conveniences. Docker Compose loads this automatically on
+# top of docker-compose.yml, so `docker compose up -d` picks it up.
+#
+# Publishing 5432 is what lets Cason train on the host and Nathaniel poke at
+# the database with psql or DBeaver. Do not deploy with this file.
+
+services:
+  postgres:
+    ports:
+      # 5432 and 5433 are often taken by other local stacks, so default to 5434
+      # -- which is what stocki.config expects when nothing is configured.
+      - "${STOCKI_HOST_DB_PORT:-5434}:5432"
