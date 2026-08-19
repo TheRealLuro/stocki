@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.idea/
+
+# training outputs
+model_training/checkpoints/
+model_training/artifacts/
+*.pt
+*.onnx
