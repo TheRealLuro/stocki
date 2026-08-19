@@ -1,11 +1,22 @@
+# Python
 __pycache__/
 *.py[cod]
-.venv/
 venv/
-.idea/
+.venv/
+.env
 
-# training outputs
-model_training/checkpoints/
-model_training/artifacts/
+# Data
+data/raw/*.csv
+data/cleaned/*.csv
+
+# Models
+*.pkl
+*.h5
 *.pt
 *.onnx
+checkpoints/
+model_training/artifacts/
+
+# IDE
+.idea/
+.vscode/
