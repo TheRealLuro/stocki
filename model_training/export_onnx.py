@@ -24,7 +24,10 @@ def load_model_for_export(weights_path: Path | str) -> StockCNN1D:
     """
     weights_path = Path(weights_path)
     if not weights_path.is_file():
-        raise FileNotFoundError(f"no weights at {weights_path}")
+        raise FileNotFoundError(
+            f"no weights at {weights_path} -- train first (`python main.py train`), or point "
+            f"--weights at an existing checkpoint such as {config.LATEST_CHECKPOINT}"
+        )
 
     blob = torch.load(weights_path, map_location="cpu", weights_only=False)
 
@@ -41,7 +44,7 @@ def load_model_for_export(weights_path: Path | str) -> StockCNN1D:
 
 
 def export_to_onnx(
-    weights_path: Path | str = config.LATEST_CHECKPOINT,
+    weights_path: Path | str = config.BEST_CHECKPOINT,
     output_path: Path | str = config.ARTIFACT_DIR / "model.onnx",
     sequence_length: int = config.SEQUENCE_LENGTH,
     opset_version: int = config.ONNX_OPSET,

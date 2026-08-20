@@ -1,6 +1,0 @@
-make an API in /model and a training framework in /model_training.
-in /model I want you to make a base model which is a 1d CNN, the final model will be predicting stock prices, it is reciving a contiguse segment of stock data as input, I don't know how many input features there will be yet, so mark where to change that out clearly, 
-aditionally, I want you to make a dataloader class, which has methods for retriving training examples, don't fill out this method yet because we have not yet determined the data structure yet. 
-I want you to make a training loop that will either load a model from memory or it will create a new model with randomized weights, I want it to then fetch training examples/labels from the dataloader and do training, have it save the model weights at the end of each epoch
-also have a method which will convert a given path to model weights and convert it into an onnx runtime file. 
-in the /models directory, I want you to create an APi which loads the onnx runtime weights and has a /predict, /predict-many and a /heath endpoints, the prediction endpoints will run the inputs through the loaded model, the /health will simply return a true if if the APi managed to sucessfully load the model.

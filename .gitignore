@@ -9,13 +9,15 @@ venv/
 data/raw/*.csv
 data/cleaned/*.csv
 
+# Bars fetched from the backend API -- regenerated on demand, never the source of truth
+model_training/.cache/
+
 # Models
 *.pkl
 *.h5
 *.pt
-*.onnx
 checkpoints/
-model_training/artifacts/
+
 
 # IDE
 .idea/
