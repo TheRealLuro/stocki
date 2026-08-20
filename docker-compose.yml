@@ -1,0 +1,84 @@
+# The Stocki backend stack.
+#
+#   docker compose up -d          bring up Postgres, load data/, start the API
+#   docker compose logs -f api    watch it
+#   docker compose down           stop (data survives in the named volume)
+#
+# Postgres is NOT published to the host here -- inside stocki-net it is simply
+# `postgres:5432`. docker-compose.override.yml publishes it for local psql and
+# for training that runs outside a container.
+
+name: stocki
+
+x-db-env: &db-env
+  STOCKI_DB_HOST: postgres
+  STOCKI_DB_PORT: "5432"
+  STOCKI_DB_NAME: ${STOCKI_DB_NAME:-stocki}
+  STOCKI_DATA_DIR: /app/data
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${STOCKI_DB_USER:-stocki}
+      POSTGRES_PASSWORD: ${STOCKI_DB_PASSWORD:-stocki}
+      POSTGRES_DB: ${STOCKI_DB_NAME:-stocki}
+    volumes:
+      - stocki-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        ["CMD-SHELL", "pg_isready -U ${STOCKI_DB_USER:-stocki} -d ${STOCKI_DB_NAME:-stocki}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    networks: [stocki-net]
+    restart: unless-stopped
+
+  # One-shot: create the schema, create the read-only role, load data/.
+  # Idempotent, so it is safe on every `up`. The API waits for it to succeed.
+  init:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    command: ["stocki", "ingest"]
+    environment:
+      <<: *db-env
+      STOCKI_DB_USER: ${STOCKI_DB_USER:-stocki}
+      STOCKI_DB_PASSWORD: ${STOCKI_DB_PASSWORD:-stocki}
+      STOCKI_RO_USER: ${STOCKI_RO_USER:-stocki_ro}
+      STOCKI_RO_PASSWORD: ${STOCKI_RO_PASSWORD:-stocki_ro}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [stocki-net]
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      <<: *db-env
+      # The API reads. It never gets credentials that could write.
+      STOCKI_DB_USER: ${STOCKI_RO_USER:-stocki_ro}
+      STOCKI_DB_PASSWORD: ${STOCKI_RO_PASSWORD:-stocki_ro}
+      STOCKI_CORS_ORIGINS: ${STOCKI_CORS_ORIGINS:-http://localhost:3000,http://localhost:5173}
+      STOCKI_RATE_LIMIT: ${STOCKI_RATE_LIMIT:-120}
+      STOCKI_DATASET_RATE_LIMIT: ${STOCKI_DATASET_RATE_LIMIT:-20}
+    ports:
+      - "${STOCKI_API_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      init:
+        condition: service_completed_successfully
+    networks: [stocki-net]
+    restart: unless-stopped
+
+networks:
+  stocki-net:
+    name: stocki-net
+    driver: bridge
+
+volumes:
+  stocki-pgdata:
