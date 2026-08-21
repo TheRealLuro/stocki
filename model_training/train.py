@@ -256,8 +256,9 @@ def train(
     optimizer = torch.optim.Adam(
         model.parameters(), lr=learning_rate, weight_decay=config.WEIGHT_DECAY
     )
-    if "optimizer_state_dict" in checkpoint:
-        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+    opt_state = checkpoint.get("optimizer_state_dict")
+    if isinstance(opt_state, dict) and opt_state and "param_groups" in opt_state:
+        optimizer.load_state_dict(opt_state)
 
     loss_fn = nn.BCELoss()  # binary classification against the Sigmoid output
     start_epoch = checkpoint.get("epoch", 0) + 1

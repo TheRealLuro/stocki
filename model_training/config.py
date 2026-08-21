@@ -92,6 +92,7 @@ VAL_DAYS = 3
 # --- Paths -----------------------------------------------------------
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 MODULE_DIR = Path(__file__).resolve().parent
+DATA_DIR = PROJECT_ROOT / "data"
 CHECKPOINT_DIR = MODULE_DIR / "checkpoints"
 ARTIFACT_DIR = MODULE_DIR / "artifacts"
 
