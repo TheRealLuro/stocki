@@ -22,7 +22,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from inference import OnnxPredictor
 
 # Path to the ONNX file produced by model_training/export_onnx.py.
-DEFAULT_MODEL_PATH = Path(__file__).resolve().parent.parent / "model_training" / "artifacts" / "model.onnx"
+DEFAULT_MODEL_PATH = Path(__file__).resolve().parent.parent / "model_training" / "artifacts" / "model_noDropout_threshold_47_5255.onnx"
 MODEL_PATH = Path(os.environ.get("MODEL_PATH", DEFAULT_MODEL_PATH))
 
 # Populated at startup; stays None when loading fails so /health can report it.
