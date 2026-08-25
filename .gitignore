@@ -18,7 +18,7 @@ model_training/.cache/
 *.pt
 checkpoints/
 model_training/checkpoints/
-model_training/artifacts/
+
 
 # IDE
 .idea/

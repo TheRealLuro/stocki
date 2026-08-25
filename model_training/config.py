@@ -115,7 +115,7 @@ DROPOUT = 0.0
 EPOCHS = 50
 BATCH_SIZE = 128
 LEARNING_RATE = 1e-3
-WEIGHT_DECAY = 0.005
+WEIGHT_DECAY = 0.0
 GRAD_CLIP_NORM = 1.0  # set to None to disable
 LOSS_FUNCTION = "bbce" # bce, wbce, bbce
 
@@ -126,5 +126,12 @@ NEGATIVE_WEIGHT = 1.5
 # -- bbce --
 BALANCE_FACTOR = 0.01
 
+
+# ------- eval hyperparameters ------------
+CLASS_THRESHOLD = 0.2
+
 # --- ONNX export -----------------------------------------------------
 ONNX_OPSET = 17
+
+# current best model_noDropout threshold 0.47 accuracy 0.5255
+

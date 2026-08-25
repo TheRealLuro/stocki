@@ -1,0 +1,9 @@
+AI was used to to generate most of the code
+
+AI was provided with instructions of how the code was to be written, I specified the format the application should take, as well as specfied many specific parts that applied to model training and model structure.
+but AI did do most of the coding, personal changes were mainly made to config.py as well as to train.py during my training process to ensure I got the best thing I could
+I also had AI refactor the evaluation code to also be able to accept the onnx runtime files as well as the regular model files
+
+I would say that AI did about 80% of the code, the remaining 20% consists of structureal details that I specificed as well as tweaks I made to the training code
+
+I created several error functions and tweaked how the model is evaluated
