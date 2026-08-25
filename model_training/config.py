@@ -107,16 +107,24 @@ LATEST_CHECKPOINT = CHECKPOINT_DIR / "latest.pt"
 BEST_CHECKPOINT = CHECKPOINT_DIR / "best.pt"
 
 # --- Model hyperparameters -------------------------------------------
-CONV_CHANNELS = (64, 128, 128)
+CONV_CHANNELS = (128, 128, 64, 32)
 KERNEL_SIZE = 5
-DROPOUT = 0.1
+DROPOUT = 0.0
 
 # --- Training hyperparameters ----------------------------------------
 EPOCHS = 50
-BATCH_SIZE = 64
+BATCH_SIZE = 128
 LEARNING_RATE = 1e-3
-WEIGHT_DECAY = 0.0
+WEIGHT_DECAY = 0.005
 GRAD_CLIP_NORM = 1.0  # set to None to disable
+LOSS_FUNCTION = "bbce" # bce, wbce, bbce
+
+# -- loss function hyperparameters ---
+# -- wbce --
+POSITIVE_WEIGHT = 1.0
+NEGATIVE_WEIGHT = 1.5
+# -- bbce --
+BALANCE_FACTOR = 0.01
 
 # --- ONNX export -----------------------------------------------------
 ONNX_OPSET = 17

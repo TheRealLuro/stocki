@@ -166,10 +166,57 @@ def save_checkpoint(
         torch.save(payload, checkpoint_dir / config.BEST_CHECKPOINT.name)
     return epoch_path
 
+# =================
+# loss functions
+# ============
+
+class WeightedBCELoss(nn.Module):
+    """ A Weighted BCE Loss function, where each possibility is weighted by a custom factor, negative or positive cases contribute more or less to the loss
+    """
+
+    def __init__(self, eps: float = 1e-7, positive_weight: float = 1.0, negative_weight: float = 1.0):
+        super().__init__()
+        self.eps = eps
+        self.positive_weight = positive_weight
+        self.negative_weight = negative_weight
+
+    def forward(self, predictions: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+        predictions = predictions.clamp(self.eps, 1 - self.eps)
+
+        per_example_loss = -(
+            targets * torch.log(predictions) * self.positive_weight + (1 - targets) * torch.log(1 - predictions) * self.negative_weight
+        )
+
+        return per_example_loss.mean()
+
+
+class BalancedBCELoss(nn.Module):
+    """ A Weighted BCE Loss function, where each possibility is weighted by a custom factor, negative or positive cases contribute more or less to the loss
+    """
+
+    def __init__(self, eps: float = 1e-7, balance_factor : float = 0.1, std_eps : float = 1e-7):
+        super().__init__()
+        self.eps = eps
+        self.balance_factor = balance_factor
+        self.std_eps = std_eps
+
+    def forward(self, predictions: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+        predictions = predictions.clamp(self.eps, 1 - self.eps)
+
+        bce = -(
+            targets * torch.log(predictions) + (1 - targets) * torch.log(1 - predictions)
+        )
+
+        homo_penalty = self.balance_factor / (predictions.std(unbiased=False) + self.std_eps)
+
+        return bce.mean() + homo_penalty
 
 # =====================================================================
 # Passes
 # =====================================================================
+
+
+
 
 
 def run_epoch(
@@ -260,13 +307,24 @@ def train(
     if isinstance(opt_state, dict) and opt_state and "param_groups" in opt_state:
         optimizer.load_state_dict(opt_state)
 
-    loss_fn = nn.BCELoss()  # binary classification against the Sigmoid output
+
+
+    loss_fn : nn.Module = None
+    match config.LOSS_FUNCTION:
+        case 'bce':
+            loss_fn = nn.BCELoss()
+        case 'wbce':
+            loss_fn = WeightedBCELoss(positive_weight=config.POSITIVE_WEIGHT, negative_weight=config.NEGATIVE_WEIGHT)
+        case 'bbce':
+            loss_fn = BalancedBCELoss(balance_factor=config.BALANCE_FACTOR)
+        case _:
+            raise ValueError(f"Unknown loss function {config.LOSS_FUNCTION}")
     start_epoch = checkpoint.get("epoch", 0) + 1
     best_val_loss = checkpoint.get("best_val_loss", float("inf"))
 
     for epoch in range(start_epoch, start_epoch + epochs):
         train_result = run_epoch(model, loader, loss_fn, device, optimizer, indices=split.train)
-        val_result = run_epoch(model, loader, loss_fn, device, indices=split.val)
+        val_result = run_epoch(model, loader, nn.BCELoss(), device, indices=split.val)
 
         train_metrics = train_result.metrics()
         val_metrics = val_result.metrics()
@@ -314,7 +372,8 @@ def evaluate(
         )
 
     model, _ = load_or_create_model(checkpoint_path, device)
-    result = run_epoch(model, loader, nn.BCELoss(), device, indices=indices)
+    loss_fn = nn.BCELoss()
+    result = run_epoch(model, loader, loss_fn, device, indices=indices)
 
     metrics = result.metrics()
     baseline = baseline_metrics(result.targets)
