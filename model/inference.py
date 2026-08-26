@@ -8,6 +8,7 @@ from typing import Sequence
 import numpy as np
 import onnxruntime as ort
 
+_BIAS = 0.05
 
 class ModelNotLoadedError(RuntimeError):
     """Raised when a prediction is requested but the ONNX model failed to load."""
@@ -74,7 +75,7 @@ class OnnxPredictor:
     def predict(self, sequence: Sequence[Sequence[float]]) -> list[float]:
         """Run one segment through the model. Returns the output values."""
         batch = self._to_channels_first(sequence, "sequence")[None, ...]
-        return self._run(batch)[0].tolist()
+        return (self._run(batch)[0] + _BIAS).tolist()
 
     def predict_many(self, sequences: Sequence[Sequence[Sequence[float]]]) -> list[list[float]]:
         """Run several segments. Returns one list of output values per segment."""
@@ -90,7 +91,7 @@ class OnnxPredictor:
             return self._run(np.stack(prepared)).tolist()
 
         # Ragged lengths can't share a batch dimension -- run them one at a time.
-        return [self._run(p[None, ...])[0].tolist() for p in prepared]
+        return [(self._run(p[None, ...])[0] + _BIAS).tolist() for p in prepared]
 
     def _run(self, batch: np.ndarray) -> np.ndarray:
         outputs = self.session.run(self.output_names, {self.input_name: batch})
