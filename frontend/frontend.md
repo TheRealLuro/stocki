@@ -5,7 +5,8 @@ React + TypeScript (Vite) dashboard for the Stocki dataset and prediction APIs.
 ## What it shows
 
 - Health pills for the backend API and the ONNX model API
-- Per-session candlestick + volume chart (`/api/v1/bars/{ticker}/{day}`)
+- Candlestick + volume chart over a selectable day range
+  (`/api/v1/bars/{ticker}/{day}` per day in the range)
 - Session details: volume, news headline, fundamentals
 - Ticker × day coverage matrix (gaps like AAPL days 1–12 are visible)
 - Dataset stats (`/api/v1/dataset/stats`), overall and per ticker
