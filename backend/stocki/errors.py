@@ -21,3 +21,19 @@ class StockiEmptyError(StockiError):
 
 class StockiValidationError(StockiError):
     """A session file failed validation and was not loaded."""
+
+
+class StockiLiveError(StockiError):
+    """Live data could not be fetched from the upstream provider."""
+
+
+class StockiCredentialsError(StockiLiveError):
+    """No Alpha Vantage API key is configured."""
+
+
+class StockiQuotaError(StockiLiveError):
+    """The provider refused the request because the plan's quota is spent."""
+
+
+class StockiPlanError(StockiLiveError):
+    """The endpoint exists but this API plan does not include it."""

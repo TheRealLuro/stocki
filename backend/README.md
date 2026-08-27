@@ -4,10 +4,14 @@ The data pipeline and API. Postgres holds the bars, `stocki.datasets` turns them
 into CNN-ready tensors, and FastAPI serves the same data to the dashboard.
 
 ```
-data/<TICKER>/day<N>.csv  ->  bars_raw  ->  stocki.datasets  ->  numpy / pandas
-                                    \                      \
-                                     v_bars, v_fundamentals  ->  /api/v1/...
+Alpha Vantage  ->  data/<TICKER>/day<N>.csv  ->  bars_raw  ->  stocki.datasets  ->  numpy / pandas
+ (stocki fetch)                                       \                      \
+                                                       v_bars, v_fundamentals  ->  /api/v1/...
 ```
+
+`stocki fetch` writes the same files the repo already commits, so live data
+reaches the model down the path the committed data always took — see
+[Live data](#live-data).
 
 ---
 
@@ -479,9 +483,125 @@ runs on another port, add it there or your fetches will be blocked.
 
 ---
 
+## Live data
+
+`stocki fetch` pulls sessions from Alpha Vantage and writes them as
+`data/<TICKER>/day<N>.csv` — the same 118 columns, the same 78 bars, the same
+UTC stamps, the same shared day numbering.
+
+```bash
+stocki fetch --days 1 && stocki ingest
+```
+
+That is the whole integration. Nothing in `model/`, `model_training/` or
+`frontend/` changes, because from where they stand nothing did: the model still
+trains, tunes and runs on `/api/v1/bars`, which still reads `bars_raw`, which is
+still a copy of the files on disk.
+
+### Setup
+
+Put a key in `backend/.env` (free ones: <https://www.alphavantage.co/support/#api-key>):
+
+```bash
+ALPHA_ADVANTAGE_KEY=your-key-here
+```
+
+`ALPHAVANTAGE_API_KEY`, `ALPHA_VANTAGE_API_KEY` and `STOCKI_ALPHAVANTAGE_KEY`
+are read too, in that order, so a teammate's spelling still works. Without a
+key nothing else changes — `fetch` is the only command that reads it.
+
+### Usage
+
+```bash
+stocki fetch                              # every ticker in data/, most recent weekday
+stocki fetch --tickers NVDA,AAPL --days 5
+stocki fetch --date 2026-08-17
+stocki fetch --dry-run                    # fetch and validate, write nothing
+stocki fetch --days 1 --ingest            # and load it into Postgres afterwards
+```
+
+| Flag | Effect |
+|---|---|
+| `--tickers` | comma-separated; default is every ticker folder in `data/` |
+| `--days N` | the last N weekdays (default 1) |
+| `--date` | one `YYYY-MM-DD` session instead |
+| `--allow-partial` | write a session with fewer than 78 bars (market still open) |
+| `--overwrite` | replace an existing `day<N>.csv` |
+| `--refresh` | ignore the fundamentals cache |
+| `--no-fundamentals` / `--no-news` | skip those calls; the columns are left `NULL` |
+| `--quote` | spend a call per ticker on the live price for `si_current_price` |
+| `--budget N` | stop after N requests (default 25) |
+| `--dry-run`, `--ingest` | validate only / run `ingest` on success |
+
+### The request budget
+
+The free plan allows **25 requests a day** at about one a second, which is the
+constraint the design is shaped around:
+
+| Call | Cost | Cached |
+|---|---|---|
+| `TIME_SERIES_INTRADAY` | 1 per ticker per calendar month covered | no |
+| `NEWS_SENTIMENT` | **1 for the whole universe** — articles carry the tickers they mention | no |
+| `OVERVIEW`, `INCOME_STATEMENT`, `BALANCE_SHEET`, `CASH_FLOW` | 4 per ticker | yes, `STOCKI_LIVE_CACHE_HOURS` (24h) |
+
+So ten tickers cost ~51 requests the first time and **~11 every day after**,
+because company reports change quarterly and are served from
+`.cache/alphavantage/`. A run that would exceed the budget stops with a message
+instead of half-writing a dataset.
+
+### Where the columns come from
+
+Most are copied. Some are derived, and those derivations were worked out from
+the committed files and are checked against them in `tests/test_live_fields.py`
+— 43 columns reproduce `data/AAPL/day13.csv` to the digit:
+
+```
+bs_total_debt          = currentLongTermDebt + longTermDebt   (98657000000)
+bs_invested_capital    = equity + total debt                  (172390000000)
+cf_free                = operatingCashflow - capex            (98767000000)
+cf_begin_cash          = closing cash - net change            (29943000000)
+si_total_cash          = MRQ cash + short-term investments    (62399000000)
+```
+
+Two scale conversions matter: `si_dividend_yield` is a percent in the files and
+a fraction upstream; `si_inst_pct` / `si_insider_pct` are the other way round.
+And `si_*` reads the **most recent quarter** while `inc_*` / `bs_*` / `cf_*`
+read the **latest annual report** — that split is what makes `si_total_cash` and
+`bs_cash` legitimately different numbers.
+
+Seven columns have no upstream field and are written `NULL` rather than zero,
+because a zero would be a claim about the company: `si_employees`,
+`si_short_ratio`, `si_target_high`, `si_target_low`, `bs_gross_ppe`,
+`bs_accum_depreciation`, `cf_deferred_tax`. `thsname_cn` has no upstream field
+either, so an existing ticker keeps the name already recorded on disk and a new
+one gets an empty cell.
+
+### Known limitation: intraday bars need a paid plan
+
+**`TIME_SERIES_INTRADAY` is a premium endpoint.** On a free key every form of
+the request comes back with:
+
+```
+This is a premium endpoint. You may subscribe to any of the premium plans
+at https://www.alphavantage.co/premium/ to instantly unlock all premium endpoints
+```
+
+Everything else `fetch` needs — the four fundamentals endpoints, news and quotes
+— works on the free tier and is verified against real responses. So on a free
+key `fetch` fills 105 of the 118 columns and reports the bars as unavailable;
+with a paid key it writes complete sessions. The client raises `StockiPlanError`
+naming the endpoint rather than failing obscurely.
+
+Daily bars (`TIME_SERIES_DAILY`) *are* free, but a daily bar is not a 5-minute
+bar. Synthesising 78 intraday bars from one daily OHLC would put prices that
+never traded into the training set, so `fetch` does not do it.
+
+---
+
 ## Command line
 
 ```bash
+stocki fetch      # pull live sessions from Alpha Vantage into data/
 stocki ingest     # read data/ into Postgres (idempotent, safe to re-run)
 stocki verify     # prove bars_raw still matches every CSV
 stocki stats      # print the data card
@@ -654,10 +774,20 @@ backend/stocki/
 ├── errors.py       errors that say what to do next
 ├── cli.py          the stocki command
 ├── db/             schema.sql, connections, the read-only role
+├── live/           Alpha Vantage -> data/<TICKER>/day<N>.csv
 ├── ingest/         columns, reader, validation, loading
 ├── datasets/       labels, windowing, loaders   <- the model imports this
 └── api/            FastAPI routes, validation, hardening
 ```
 
 `datasets/` never imports `api/`, so training and notebooks do not need FastAPI
-installed.
+installed. `live/` is imported by nothing except `cli.py`, and only inside the
+`fetch` handler — a clone with no API key behaves exactly as it did before.
+
+```
+live/
+├── client.py     the HTTP client: budget, throttle, cache, error envelopes
+├── fields.py     provider JSON -> the 118 columns (pure, no I/O)
+├── sessions.py   the market clock and the shared day numbering
+└── fetch.py      orchestration: fetch, validate, write
+```

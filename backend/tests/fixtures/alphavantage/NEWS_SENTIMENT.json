@@ -1,0 +1,165 @@
+{
+ "items": "10",
+ "feed": [
+  {
+   "title": "Wearable Devices Announces First Half 2026 Financial Results and Provides Corporate Update",
+   "time_published": "20260824T194254",
+   "ticker_sentiment": [
+    {
+     "ticker": "WLDS",
+     "relevance_score": "1.000000"
+    },
+    {
+     "ticker": "AAPL",
+     "relevance_score": "0.727273"
+    },
+    {
+     "ticker": "MSFT",
+     "relevance_score": "0.643237"
+    }
+   ]
+  },
+  {
+   "title": "Tencent Music Summit Maps Chinese Music’s Future Across AI, Copyright And Global Growth",
+   "time_published": "20260824T194230",
+   "ticker_sentiment": [
+    {
+     "ticker": "TME",
+     "relevance_score": "0.326851"
+    },
+    {
+     "ticker": "AAPL",
+     "relevance_score": "0.618918"
+    }
+   ]
+  },
+  {
+   "title": "Many AI Stocks Are Burning Cash: Canada's Celestica Is Printing Real Earnings",
+   "time_published": "20260824T191200",
+   "ticker_sentiment": [
+    {
+     "ticker": "CLS",
+     "relevance_score": "1.000000"
+    },
+    {
+     "ticker": "NVDA",
+     "relevance_score": "0.620559"
+    },
+    {
+     "ticker": "MSFT",
+     "relevance_score": "0.572523"
+    },
+    {
+     "ticker": "IBM",
+     "relevance_score": "0.553360"
+    },
+    {
+     "ticker": "AAPL",
+     "relevance_score": "0.565030"
+    }
+   ]
+  },
+  {
+   "title": "Can Apple Inc. (NASDAQ:AAPL) Keep Its Steady Hand As Big Tech Leads Markets Higher?",
+   "time_published": "20260824T183701",
+   "ticker_sentiment": [
+    {
+     "ticker": "AAPL",
+     "relevance_score": "1.000000"
+    },
+    {
+     "ticker": "GOOGL",
+     "relevance_score": "0.721422"
+    },
+    {
+     "ticker": "GOOG",
+     "relevance_score": "0.729217"
+    },
+    {
+     "ticker": "MSFT",
+     "relevance_score": "0.608081"
+    },
+    {
+     "ticker": "AMZN",
+     "relevance_score": "0.630643"
+    }
+   ]
+  },
+  {
+   "title": "Adobe Inc (ADBE) News, Articles, Events & Latest Updates",
+   "time_published": "20260824T175308",
+   "ticker_sentiment": [
+    {
+     "ticker": "ADBE",
+     "relevance_score": "0.984428"
+    },
+    {
+     "ticker": "MU",
+     "relevance_score": "0.669419"
+    },
+    {
+     "ticker": "AAPL",
+     "relevance_score": "0.723697"
+    }
+   ]
+  },
+  {
+   "title": "Apple's AI Push: New Macs & Aura's IPO Plans",
+   "time_published": "20260825T190705",
+   "ticker_sentiment": [
+    {
+     "ticker": "AAPL",
+     "relevance_score": "1.000000"
+    }
+   ]
+  },
+  {
+   "title": "Apple Reveals The Next-Gen M6 And M5 Ultra Chips - Here's What You Need To Know",
+   "time_published": "20260825T183709",
+   "ticker_sentiment": [
+    {
+     "ticker": "AAPL",
+     "relevance_score": "1.000000"
+    }
+   ]
+  },
+  {
+   "title": "Apple unveils new Mac mini lineup with faster AI processing",
+   "time_published": "20260825T153400",
+   "ticker_sentiment": [
+    {
+     "ticker": "AAPL",
+     "relevance_score": "1.000000"
+    }
+   ]
+  },
+  {
+   "title": "The Mac Mini Is Back With Powerful Next-Gen Performance (And A Price Hike To Match)",
+   "time_published": "20260825T151758",
+   "ticker_sentiment": [
+    {
+     "ticker": "AAPL",
+     "relevance_score": "0.950847"
+    }
+   ]
+  },
+  {
+   "title": "Xiaomi's Xring O3 Chip Takes On Qualcomm and MediaTek",
+   "time_published": "20260825T142823",
+   "ticker_sentiment": [
+    {
+     "ticker": "QCOM",
+     "relevance_score": "1.000000"
+    },
+    {
+     "ticker": "NVDA",
+     "relevance_score": "0.615820"
+    },
+    {
+     "ticker": "AAPL",
+     "relevance_score": "0.617208"
+    }
+   ]
+  }
+ ]
+}
