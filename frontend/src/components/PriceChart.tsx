@@ -9,13 +9,15 @@ const VOL_H = 56;
 const GAP = 14;
 const H = PAD_T + PRICE_H + GAP + VOL_H + 24;
 
-function fmtTime(ts: string): string {
-  // "2026-07-20T13:30:00Z" -> "13:30"
-  return ts.slice(11, 16);
+function fmtTime(b: Bar, multiDay: boolean): string {
+  // "2026-07-20T13:30:00Z" -> "13:30", or "D5 13:30" across sessions
+  const t = b.timestamp.slice(11, 16);
+  return multiDay ? `D${b.day} ${t}` : t;
 }
 
 export function PriceChart({ bars }: { bars: Bar[] }) {
   const n = bars.length;
+  const multiDay = bars[0].day !== bars[n - 1].day;
   const innerW = W - PAD_L - PAD_R;
   const step = innerW / n;
   const candleW = Math.max(2, Math.min(10, step * 0.6));
@@ -111,7 +113,7 @@ export function PriceChart({ bars }: { bars: Bar[] }) {
             className="axis"
             textAnchor="middle"
           >
-            {fmtTime(bars[i].timestamp)}
+            {fmtTime(bars[i], multiDay)}
           </text>
         ))}
       </svg>

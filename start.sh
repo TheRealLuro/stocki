@@ -108,15 +108,6 @@ if [ ! -x "$UVICORN" ]; then
   fi
 fi
 
-if [ ! -f model_training/checkpoints/latest.pt ] || [ ! -f model_training/artifacts/model.onnx ]; then
-  echo "==> Training a real model checkpoint and exporting ONNX for the model API."
-  "$ROOT/.venv/bin/python" model_training/main.py train --epochs 1
-  "$ROOT/.venv/bin/python" model_training/main.py export \
-    --weights model_training/checkpoints/latest.pt \
-    --output model_training/artifacts/model.onnx \
-    --no-verify
-fi
-
 kill_stale_model_api "$MODEL_PORT"
 
 echo "==> Starting model API on :$MODEL_PORT"
