@@ -25,9 +25,28 @@ DEFAULT_NAME = "stocki"
 DEFAULT_USER = "stocki"
 DEFAULT_CORS = ["http://localhost:3000", "http://localhost:5173"]
 
+#: Where `stocki fetch` looks for the Alpha Vantage key, in order. The first is
+#: the name in `backend/.env`; the rest are the spellings people actually type
+#: (the vendor is "Alpha Vantage", which is easy to mistype as "Advantage").
+ALPHAVANTAGE_KEY_NAMES = (
+    "ALPHA_ADVANTAGE_KEY",
+    "ALPHAVANTAGE_API_KEY",
+    "ALPHA_VANTAGE_API_KEY",
+    "STOCKI_ALPHAVANTAGE_KEY",
+)
+
 
 def _split_origins(raw: str) -> list[str]:
     return [origin.strip() for origin in raw.split(",") if origin.strip()]
+
+
+def _alphavantage_key() -> str | None:
+    """The first non-empty key among `ALPHAVANTAGE_KEY_NAMES`, or None."""
+    for name in ALPHAVANTAGE_KEY_NAMES:
+        value = os.getenv(name, "").strip()
+        if value:
+            return value
+    return None
 
 
 @dataclass(frozen=True)
@@ -46,11 +65,28 @@ class Settings:
     ro_user: str = "stocki_ro"
     ro_password: str = field(default="stocki_ro", repr=False)
 
+    # --- live data (`stocki fetch`) ---------------------------------------
+    # Only the fetch path reads these; ingest, the datasets and the API never
+    # do, so a clone with no Alpha Vantage key works exactly as before.
+    alphavantage_key: str | None = field(default=None, repr=False)
+    live_cache_dir: Path = REPO_ROOT / ".cache" / "alphavantage"
+    live_cache_hours: float = 24.0
+    live_min_interval: float = 1.5  # seconds between calls; the free plan allows ~1/s
+    live_request_budget: int = 25  # the free plan's daily allowance
+
     @classmethod
     def from_env(cls) -> Settings:
         raw_origins = os.getenv("STOCKI_CORS_ORIGINS")
         raw_data_dir = os.getenv("STOCKI_DATA_DIR")
+        raw_cache_dir = os.getenv("STOCKI_LIVE_CACHE_DIR")
         return cls(
+            alphavantage_key=_alphavantage_key(),
+            live_cache_dir=(
+                Path(raw_cache_dir) if raw_cache_dir else REPO_ROOT / ".cache" / "alphavantage"
+            ),
+            live_cache_hours=float(os.getenv("STOCKI_LIVE_CACHE_HOURS", "24")),
+            live_min_interval=float(os.getenv("STOCKI_LIVE_MIN_INTERVAL", "1.5")),
+            live_request_budget=int(os.getenv("STOCKI_LIVE_REQUEST_BUDGET", "25")),
             ro_user=os.getenv("STOCKI_RO_USER", "stocki_ro"),
             ro_password=os.getenv("STOCKI_RO_PASSWORD", "stocki_ro"),
             rate_limit_per_minute=int(os.getenv("STOCKI_RATE_LIMIT", "120")),

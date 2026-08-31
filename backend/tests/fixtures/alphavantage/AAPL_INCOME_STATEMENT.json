@@ -1,0 +1,63 @@
+{
+ "symbol": "AAPL",
+ "annualReports": [
+  {
+   "fiscalDateEnding": "2025-09-30",
+   "reportedCurrency": "USD",
+   "grossProfit": "195201000000",
+   "totalRevenue": "416161000000",
+   "costOfRevenue": "220960000000",
+   "costofGoodsAndServicesSold": "220960000000",
+   "operatingIncome": "133050000000",
+   "sellingGeneralAndAdministrative": "27601000000",
+   "researchAndDevelopment": "34550000000",
+   "operatingExpenses": "62151000000",
+   "investmentIncomeNet": "None",
+   "netInterestIncome": "None",
+   "interestIncome": "None",
+   "interestExpense": "None",
+   "nonInterestIncome": "None",
+   "otherNonOperatingIncome": "None",
+   "depreciation": "None",
+   "depreciationAndAmortization": "11698000000",
+   "incomeBeforeTax": "132729000000",
+   "incomeTaxExpense": "20719000000",
+   "interestAndDebtExpense": "None",
+   "netIncomeFromContinuingOperations": "112010000000",
+   "comprehensiveIncomeNetOfTax": "None",
+   "ebit": "132729000000",
+   "ebitda": "144427000000",
+   "netIncome": "112010000000"
+  }
+ ],
+ "quarterlyReports": [
+  {
+   "fiscalDateEnding": "2026-06-30",
+   "reportedCurrency": "USD",
+   "grossProfit": "54770000000",
+   "totalRevenue": "109417000000",
+   "costOfRevenue": "54647000000",
+   "costofGoodsAndServicesSold": "54647000000",
+   "operatingIncome": "35695000000",
+   "sellingGeneralAndAdministrative": "7346000000",
+   "researchAndDevelopment": "11729000000",
+   "operatingExpenses": "19075000000",
+   "investmentIncomeNet": "None",
+   "netInterestIncome": "None",
+   "interestIncome": "None",
+   "interestExpense": "None",
+   "nonInterestIncome": "None",
+   "otherNonOperatingIncome": "None",
+   "depreciation": "None",
+   "depreciationAndAmortization": "3320000000",
+   "incomeBeforeTax": "36267000000",
+   "incomeTaxExpense": "6478000000",
+   "interestAndDebtExpense": "None",
+   "netIncomeFromContinuingOperations": "29789000000",
+   "comprehensiveIncomeNetOfTax": "None",
+   "ebit": "35695000000",
+   "ebitda": "39015000000",
+   "netIncome": "29789000000"
+  }
+ ]
+}

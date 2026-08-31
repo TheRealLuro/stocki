@@ -23,3 +23,6 @@ model_training/checkpoints/
 # IDE
 .idea/
 .vscode/
+
+# Alpha Vantage responses cached by `stocki fetch` -- refetched on demand
+.cache/
